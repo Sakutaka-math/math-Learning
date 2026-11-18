@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>指数関数と対数関数の対称性</title>
+<style>
+:root{--blue:#1557d5;--red:#df1515;--green:#159447;--navy:#073f86;--bg:#f4f9ff}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);font-family:"Hiragino Sans","Yu Gothic",sans-serif;color:#111}
+main{max-width:1180px;margin:auto;padding:16px}.title{background:linear-gradient(90deg,#073f86,#0754ae);color:#fff;border-radius:16px;padding:16px;text-align:center;font-weight:800;font-size:clamp(24px,4vw,42px)}
+.title i{color:#ffe448;font-family:Georgia,serif}.layout{display:grid;grid-template-columns:1.55fr 1fr;gap:14px;margin-top:14px}.card{background:white;border:2px solid #d9edf8;border-radius:18px;padding:12px;box-shadow:0 4px 16px #3270a012}
+canvas{width:100%;height:auto;display:block}.step{color:white;background:#59a0e8;border-radius:10px;padding:8px 14px;font-size:25px;font-weight:800}.msg{margin-top:12px;font-size:20px;line-height:1.75}.key{padding:12px;background:#fff5b4;border-radius:12px;text-align:center;font-weight:800;font-size:23px}.formula{font-family:Georgia,"Times New Roman",serif;font-style:italic;font-size:28px}.blue{color:var(--blue)}.red{color:var(--red)}.green{color:var(--green)}
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.controls button{flex:1 1 130px;border:0;border-radius:12px;padding:12px 8px;font-size:16px;font-weight:700;background:#dce9fb;color:#11366d;cursor:pointer}.controls button.active{background:#1e58b9;color:white}.controls button:hover{filter:brightness(.96)}
+@media(max-width:800px){.layout{grid-template-columns:1fr}.msg{font-size:17px}.title{font-size:27px}}
+</style>
+</head>
+<body><main>
+<div class="title">指数関数と対数関数は <i>y = x</i> に関して対称</div>
+<div class="layout">
+ <div class="card"><canvas id="g" width="700" height="570"></canvas></div>
+ <div class="card"><div class="step" id="stepLbl">ステップ 1 / 6</div><div class="msg" id="msg"></div></div>
+</div>
+<div class="controls">
+<button data-s="0">最初に戻る</button><button data-s="1">1　指数関数</button><button data-s="2">2　y = x</button><button data-s="3">3　点 (2, 4)</button><button data-s="4">4　対称移動</button><button data-s="5">5　対数関数</button><button data-s="6">6　まとめ</button>
+</div>
+</main>
+<script>
+const c=document.getElementById('g'),ctx=c.getContext('2d'),msg=document.getElementById('msg'),stepLbl=document.getElementById('stepLbl');
+const xmin=-2,xmax=5.3,ymin=-1.3,ymax=5.3,pad=52,W=c.width,H=c.height;
+const X=x=>pad+(x-xmin)/(xmax-xmin)*(W-2*pad), Y=y=>H-pad-(y-ymin)/(ymax-ymin)*(H-2*pad);
+let step=1,anim=null;
+function base(){ctx.clearRect(0,0,W,H);ctx.lineWidth=1;ctx.strokeStyle='#dfe4e8';for(let x=-2;x<=5;x++){line(X(x),Y(ymin),X(x),Y(ymax));}for(let y=-1;y<=5;y++){line(X(xmin),Y(y),X(xmax),Y(y));}
+ ctx.strokeStyle='#111';ctx.lineWidth=2;line(X(xmin),Y(0),X(xmax),Y(0));line(X(0),Y(ymin),X(0),Y(ymax));ctx.fillStyle='#111';ctx.font='18px Georgia';for(let x=-2;x<=5;x++)ctx.fillText(x,X(x)-5,Y(0)+23);for(let y=-1;y<=5;y++)if(y)ctx.fillText(y,X(0)-27,Y(y)+6);ctx.font='italic 24px Georgia';ctx.fillText('x',X(xmax)-5,Y(0)+30);ctx.fillText('y',X(0)-8,Y(ymax)-8)}
+function line(x1,y1,x2,y2){ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke()}
+function curve(fn,a,b,color){ctx.beginPath();let started=false;for(let x=a;x<=b;x+=(b-a)/350){let y=fn(x);if(y<ymin-.5||y>ymax+.5)continue;let px=X(x),py=Y(y);if(!started){ctx.moveTo(px,py);started=true}else ctx.lineTo(px,py)}ctx.strokeStyle=color;ctx.lineWidth=4;ctx.stroke()}
+function dot(x,y,color,label){ctx.fillStyle=color;ctx.beginPath();ctx.arc(X(x),Y(y),8,0,Math.PI*2);ctx.fill();ctx.font='bold 20px Georgia';ctx.fillText(label,X(x)+12,Y(y)-10)}
+function draw(t){base();if(step>=1){curve(x=>2**x,-2,2.45,'#1557d5');ctx.fillStyle='#1557d5';ctx.font='italic 24px Georgia';ctx.fillText('y = 2ˣ',X(2.3),Y(5))}if(step>=2){ctx.setLineDash([10,8]);ctx.strokeStyle='#159447';ctx.lineWidth=3;line(X(-1.25),Y(-1.25),X(5.2),Y(5.2));ctx.setLineDash([]);ctx.fillStyle='#159447';ctx.font='italic 23px Georgia';ctx.fillText('y = x',X(4.25),Y(4.65))}if(step>=3)dot(2,4,'#1557d5','(2, 4)');if(step===4){let u=Math.min(1,t||0),x=2+2*u,y=4-2*u;dot(x,y,'#8250d5','');}if(step>=5)dot(4,2,'#df1515','(4, 2)');if(step>=5){curve(x=>Math.log2(x),.16,5.25,'#df1515');ctx.fillStyle='#df1515';ctx.font='italic 23px Georgia';ctx.fillText('y = log₂ x',X(3.65),Y(1.2))}}
+const texts={1:`<div class="key"><span class="blue formula">y = 2<sup>x</sup></span> を考えます。</div><p>まず指数関数をグラフに表します。</p>`,2:`<div class="key">直線 <span class="green formula">y = x</span> を表示します。</div><p>この直線を「鏡」のように考えてみましょう。</p>`,3:`<div class="key">指数関数上の点 <span class="blue formula">(2, 4)</span></div><p><span class="formula">2<sup>2</sup> = 4</span> なので、点 (2,4) は <span class="blue formula">y=2<sup>x</sup></span> 上にあります。</p>`,4:`<div class="key">点 (2,4) を <span class="green formula">y=x</span> に関して対称移動</div><p><b>x座標とy座標が入れ替わり</b>、(4,2) になります。</p>`,5:`<div class="key"><span class="red formula">(4, 2)</span> は対数関数上の点</div><p><span class="formula">2<sup>2</sup>=4 ⇔ log<sub>2</sub>4=2</span></p><p>したがって、対称移動した点は <span class="red formula">y=log<sub>2</sub>x</span> 上にあります。</p>`,6:`<div class="key">指数関数と対数関数は<br><span class="red formula">y = x</span> に関して対称です。</div><p><span class="blue formula">y=2<sup>x</sup></span> の x と y を入れ替えると <span class="formula">x=2<sup>y</sup></span>。</p><p>これを y について表すと <span class="red formula">y=log<sub>2</sub>x</span>。</p><p style="text-align:center;font-size:25px"><b>「逆関数」だから対称</b></p>`};
+function setStep(s){cancelAnimationFrame(anim);step=s===0?1:s;stepLbl.textContent=`ステップ ${step} / 6`;msg.innerHTML=texts[step];document.querySelectorAll('button').forEach(b=>b.classList.toggle('active',+b.dataset.s===step));if(step===4){let start=performance.now();const go=now=>{let u=Math.min(1,(now-start)/1400);draw(u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2);if(u<1)anim=requestAnimationFrame(go);else{step=5;stepLbl.textContent='ステップ 5 / 6';msg.innerHTML=texts[5];draw();}};anim=requestAnimationFrame(go)}else draw()}
+document.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>setStep(+b.dataset.s)));setStep(1);
+</script></body></html>
